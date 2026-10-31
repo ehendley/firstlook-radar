@@ -15,3 +15,4 @@
 @media(max-width:850px){.hero{grid-template-columns:minmax(0,1fr)}.hero-art{width:100%;max-width:450px}}
 @media(max-width:600px){.hero-art{max-width:380px}}
 @media(max-width:600px){.section-heading{flex-direction:column;align-items:flex-start;gap:16px}.section-heading>p{max-width:none;text-align:left;font-size:12px}.section-heading>p br{display:none}}
+.service-notice{flex-wrap:wrap}.service-notice #service-message{flex:1;min-width:0}.service-retry{flex-basis:100%;text-align:left;padding:5px 0 2px 13px;text-decoration:underline;text-underline-offset:3px;font-weight:650;font-size:inherit;min-height:32px}

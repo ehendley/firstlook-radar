@@ -1,6 +1,7 @@
 import { DIMENSIONS, ARCHETYPES, SAMPLE_REPORT, validateReport } from './report.mjs';
 import { preparePhoto, createRequestGate } from './media.mjs';
 import { drawRadar, createShareCard, downloadCanvas, shareText } from './share.mjs';
+import { createServiceConnection } from './connection.mjs';
 
 const $ = selector => document.querySelector(selector);
 const photoInput = $('#photo-input');
@@ -17,7 +18,6 @@ let busy = false;
 let controller = null;
 let apiBase = '';
 let serviceReady = false;
-let configLoaded = false;
 let toastTimer;
 let currentReport = null;
 
@@ -123,38 +123,32 @@ dropZone.addEventListener('drop', event => {
   selectPhoto(files[0]);
 });
 
-function notice(message, ready = false) {
-  const node = $('#service-notice');
-  node.lastElementChild.textContent = message;
-  node.classList.toggle('ready', ready);
-}
-
-async function loadConfig() {
-  try {
-    const response = await fetch(new URL('./config.json', import.meta.url), {cache:'no-store'});
-    if (!response.ok) throw new Error('config');
-    const config = await response.json();
-    if (typeof config.apiBaseUrl !== 'string' || !config.apiBaseUrl.trim()) {
-      notice('真实分析尚未开通。现在可以上传预览，或先查看完整示例报告。'); return;
-    }
-    const url = new URL(config.apiBaseUrl, location.href);
-    if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) throw new Error('config');
-    apiBase = url.href.replace(/\/$/, '');
-    const healthController = new AbortController();
-    const timeout = setTimeout(() => healthController.abort(), 6000);
-    try {
-      const health = await fetch(`${apiBase}/api/health`, {signal:healthController.signal});
-      if (!health.ok) throw new Error('health');
-      const status = await health.json();
-      if (status.configured !== true) { notice('真实分析正在准备中，暂时无法生成真实报告。你仍可上传预览、查看示例。'); return; }
-    } finally { clearTimeout(timeout); }
-    serviceReady = true;
-    notice('分析服务已准备好。确认授权后，照片才会发送。', true);
-  } catch {
-    notice('暂时连不上分析服务。上传预览与示例仍可使用，请稍后刷新重试。');
-  } finally { configLoaded = true; updateSubmit(); }
-}
-loadConfig();
+const serviceMessages = {
+  checking: '正在连接分析服务，请稍等…',
+  ready: '分析服务已准备好。确认授权后，照片才会发送。',
+  unconfigured: '真实分析尚未开通。你仍可上传预览，或先查看示例报告。',
+  invalid: '分析服务设置有误，请联系网站维护者。你仍可查看示例报告。',
+  timeout: '连接分析服务超时。已选照片会保留，请重新连接或切换网络后再试。',
+  unavailable: '暂时连不上分析服务，当前网络可能无法访问服务地址。已选照片会保留，请重新连接或切换网络后再试。',
+};
+const connection = createServiceConnection({
+  configUrl: new URL('./config.json', import.meta.url),
+  onChange(state) {
+    serviceReady = state.status === 'ready';
+    apiBase = state.apiBase;
+    $('#service-message').textContent = serviceMessages[state.status];
+    $('#service-notice').classList.toggle('ready', serviceReady);
+    $('#service-retry').hidden = ['idle', 'checking', 'ready'].includes(state.status);
+    updateSubmit();
+  },
+});
+$('#service-retry').addEventListener('click', () => connection.check());
+window.addEventListener('online', () => connection.check({automatic:true}));
+window.addEventListener('pageshow', event => { if (event.persisted) connection.check({automatic:true}); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') connection.check({automatic:true});
+});
+connection.check();
 
 const errorMessages = {
   RATE_LIMITED: '今天的好奇有点拥挤，请稍后再试。',
@@ -168,7 +162,7 @@ form.addEventListener('submit', async event => {
   event.preventDefault(); setError();
   if (!photo) { setError('先选择一张清晰的单人照片吧。'); return; }
   if (!$('#consent').checked) { setError('请先阅读并勾选照片使用与 AI 分析授权。'); $('#consent').focus(); return; }
-  if (!serviceReady) { setError(configLoaded ? '真实分析暂未开通，你可以先体验示例报告。' : '还在确认服务配置，请稍等片刻。'); return; }
+  if (!serviceReady) { setError(connection.state.status === 'checking' ? '正在连接分析服务，请稍等片刻。' : '尚未连接分析服务，请点击“重新连接”后再试。'); return; }
   cancelAnalysis();
   const token = gate.begin();
   const requestController = new AbortController();

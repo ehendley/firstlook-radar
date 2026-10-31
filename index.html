@@ -7,8 +7,8 @@
   <meta name="description" content="初见雷达，把照片里看得见的风格，变成一张属于你的第一印象卡。六个视觉维度，发现不同场景下的你。">
   <title>初见雷达 · 发现你的第一印象</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23d5f567'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%2320201d' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='10' fill='none' stroke='%2320201d' stroke-width='2'/%3E%3Cpath d='M32 32L48 16' stroke='%2320201d' stroke-width='3'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./styles.css">
-  <script type="module" src="./app.mjs"></script>
+  <link rel="stylesheet" href="./styles.css?v=20261101-reconnect">
+  <script type="module" src="./app.mjs?v=20261101-reconnect"></script>
 </head>
 <body>
   <a class="skip-link" href="#test">跳到开始测试</a>
@@ -64,7 +64,7 @@
             <label class="scene-option"><input type="radio" name="scene" value="work"><span class="scene-symbol" aria-hidden="true">▱</span><span><b>工作亮相</b><small>看看这张照片的专业表达</small></span><span class="scene-radio" aria-hidden="true"></span></label>
           </div></fieldset>
           <div class="consent-block"><p class="form-step"><span class="step-number">02</span>照片由你决定</p><label class="checkbox-label"><input type="checkbox" id="consent"><span>我有权使用这张照片，并同意将处理后的照片通过本站后端转发至 AI 模型服务进行分析。</span></label><p class="privacy-note">照片仅在当前页面内存中处理，不写入浏览器相册或本站报告库。模型供应商可能依其政策处理数据。<a href="#privacy">了解照片如何处理 ↗</a></p></div>
-          <div class="service-notice" id="service-notice"><span class="status-dot"></span><span>正在确认分析服务配置…</span></div>
+          <div class="service-notice" id="service-notice"><span class="status-dot" aria-hidden="true"></span><span id="service-message" role="status" aria-live="polite">正在连接分析服务，请稍等…</span><button class="service-retry" id="service-retry" type="button" hidden>重新连接 ↻</button></div>
           <button class="button primary analyze-button" id="analyze-button" type="submit" disabled><span>生成我的初见报告</span><span aria-hidden="true">↗</span></button>
           <p class="form-error" id="form-error" role="alert" hidden></p>
           <p class="form-note">没有准备好照片？<button class="text-button" data-sample type="button">先逛逛示例报告 →</button></p>
