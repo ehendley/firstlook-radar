@@ -4,8 +4,8 @@
 
 网站：[初见雷达](https://ehendley.github.io/firstlook-radar/)
 
-本站使用 GitHub Pages 的 main 分支根目录发布。仓库根目录是可直接运行的前端部署文件。完整可开发源码（含结果设计、后端、测试、部署说明）见 [full-source.zip](full-source.zip)。解压后按其中 README.md 操作。
+本站使用 GitHub Pages 的 main 分支根目录发布。根目录是可直接运行的前端部署文件。完整源码（含结果设计、Cloudflare后端、测试、部署说明）见 [full-source.zip](full-source.zip)。解压后按其中 README.md 操作。
 
-后端地址： https://firstlook-radar-api.ehendley62.workers.dev 。模型为阿里云百炼 qwen3-vl-plus，北京地域。API Key只放Cloudflare Worker Secret。当前真实分析等待百炼 API Host 和 Key 配置，页面明确标注并提供完整示例体验。
+后端：https://firstlook-radar-api.ehendley62.workers.dev 。已接通阿里云百炼 qwen3-vl-plus（北京），API Key仅保存在Cloudflare Worker Secret中。
 
-本地已通过20项行为测试，桌面/320px手机宽度、上传边界与PNG下载已检查。真实模型效果尚待百炼配置后验证。
+验证：21项自动测试通过；已用阿里云官方示例图成功生成真实报告（约33秒），返回6个维度、3个记忆点和3条建议。桌面/320px手机布局、照片上传压缩及PNG下载已检查。示例报告与真实分析明确区分，测试不代表对所有照片的效果或准确性保证。
